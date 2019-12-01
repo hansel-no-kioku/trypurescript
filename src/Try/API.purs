@@ -207,6 +207,8 @@ newtype BackendConfig = BackendConfig
                    . String
                   -> ExceptT String (ContT Unit (Eff (dom :: DOM | eff)))
                        (Either (NonEmptyList ForeignError) CompileResult)
+  , preScript     :: String
+  , postScript    :: String
   }
 
 data Backend
@@ -243,6 +245,8 @@ getBackendConfig Core = BackendConfig
   , extra_styling: ""
   , extra_body: ""
   , compile: compile $ host <> "/api/core"
+  , preScript: preScriptCore
+  , postScript: postScriptCore
   }
 getBackendConfig Thermite = BackendConfig
   { backend: "thermite"
@@ -250,6 +254,8 @@ getBackendConfig Thermite = BackendConfig
   , extra_styling: """<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">"""
   , extra_body: """<div id="app"></div>"""
   , compile: compile "https://compile.purescript.org/thermite"
+  , preScript: ""
+  , postScript: ""
   }
 getBackendConfig Slides = BackendConfig
   { backend: "slides"
@@ -257,6 +263,8 @@ getBackendConfig Slides = BackendConfig
   , extra_styling: """<link rel="stylesheet" href="css/slides.css">"""
   , extra_body: """<div id="main"></div>"""
   , compile: compile "https://compile.purescript.org/slides"
+  , preScript: ""
+  , postScript: ""
   }
 getBackendConfig Mathbox = BackendConfig
   { backend: "mathbox"
@@ -267,6 +275,8 @@ getBackendConfig Mathbox = BackendConfig
       ]
   , extra_body: ""
   , compile: compile "https://compile.purescript.org/purescript-mathbox"
+  , preScript: ""
+  , postScript: ""
   }
 getBackendConfig Behaviors = BackendConfig
   { backend: "behaviors"
@@ -274,6 +284,8 @@ getBackendConfig Behaviors = BackendConfig
   , extra_styling: ""
   , extra_body: """<canvas id="canvas" width="800" height="600"></canvas>"""
   , compile: compile "https://compile.purescript.org/behaviors"
+  , preScript: ""
+  , postScript: ""
   }
 getBackendConfig Flare = BackendConfig
   { backend: "flare"
@@ -286,7 +298,38 @@ getBackendConfig Flare = BackendConfig
       , """<canvas id="canvas" width="800" height="600"></canvas>"""
       ]
   , compile: compile "https://compile.purescript.org/flare"
+  , preScript: ""
+  , postScript: ""
   }
 
 getBackendConfigFromString :: String -> BackendConfig
 getBackendConfigFromString s = getBackendConfig (unsafePartial backendFromString s)
+
+preScriptCore :: String
+preScriptCore = """
+;(function() {
+  const oldLog = console.log;
+  const oldOnError = window.onerror;
+  let lines = "";
+
+  console.log = function(s) { lines += s + "\n"; };
+  window.onerror = function(e) { lines += e.message + "\n"; return true; };
+
+  try {
+"""
+
+postScriptCore :: String
+postScriptCore = """
+  } catch(e) {
+    lines += e.message + "\n";
+  } finally {
+    console.log = oldLog;
+    window.onerror = oldOnError;
+  }
+
+  if(lines.length > 0) {
+    document.body.innerHTML += "<pre>" + lines + "</pre>";
+  }
+  return {};
+})();
+"""

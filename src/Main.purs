@@ -214,7 +214,7 @@ execute bundled bc@(BackendConfig backend) = do
         , """</html>"""
         ]
 
-      scripts = unwrap bundled
+      scripts = backend.preScript <> unwrap bundled <> backend.postScript
 
   column2 <- JQuery.select "#column2"
   runEffFn3 setupIFrame column2 html scripts
