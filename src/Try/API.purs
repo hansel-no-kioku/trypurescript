@@ -36,6 +36,7 @@ import Data.String.Regex (replace)
 import Data.String.Regex.Flags (global)
 import Data.String.Regex.Unsafe (unsafeRegex)
 import Partial.Unsafe (unsafePartial)
+import Try.Host (host)
 import Try.Types (JS(JS))
 
 decodingOptions :: Options
@@ -106,6 +107,7 @@ instance decodeCompileWarning :: Decode CompileWarning where
 
 newtype SuccessResult = SuccessResult
   { js :: String
+  , bundled :: String
   , warnings :: NullOrUndefined (Array CompileWarning)
   }
 
@@ -205,7 +207,6 @@ newtype BackendConfig = BackendConfig
                    . String
                   -> ExceptT String (ContT Unit (Eff (dom :: DOM | eff)))
                        (Either (NonEmptyList ForeignError) CompileResult)
-  , getBundle     :: forall eff. ExceptT String (ContT Unit (Eff (dom :: DOM | eff))) JS
   }
 
 data Backend
@@ -241,8 +242,7 @@ getBackendConfig Core = BackendConfig
   , mainGist: "b57a766d417e109785540d584266fc33"
   , extra_styling: ""
   , extra_body: ""
-  , compile: compile "https://compile.purescript.org/try"
-  , getBundle: getDefaultBundle "https://compile.purescript.org/try"
+  , compile: compile $ host <> "/api/core"
   }
 getBackendConfig Thermite = BackendConfig
   { backend: "thermite"
@@ -250,7 +250,6 @@ getBackendConfig Thermite = BackendConfig
   , extra_styling: """<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">"""
   , extra_body: """<div id="app"></div>"""
   , compile: compile "https://compile.purescript.org/thermite"
-  , getBundle: getThermiteBundle "https://compile.purescript.org/thermite"
   }
 getBackendConfig Slides = BackendConfig
   { backend: "slides"
@@ -258,7 +257,6 @@ getBackendConfig Slides = BackendConfig
   , extra_styling: """<link rel="stylesheet" href="css/slides.css">"""
   , extra_body: """<div id="main"></div>"""
   , compile: compile "https://compile.purescript.org/slides"
-  , getBundle: getDefaultBundle "https://compile.purescript.org/slides"
   }
 getBackendConfig Mathbox = BackendConfig
   { backend: "mathbox"
@@ -269,7 +267,6 @@ getBackendConfig Mathbox = BackendConfig
       ]
   , extra_body: ""
   , compile: compile "https://compile.purescript.org/purescript-mathbox"
-  , getBundle: getDefaultBundle "https://compile.purescript.org/purescript-mathbox"
   }
 getBackendConfig Behaviors = BackendConfig
   { backend: "behaviors"
@@ -277,7 +274,6 @@ getBackendConfig Behaviors = BackendConfig
   , extra_styling: ""
   , extra_body: """<canvas id="canvas" width="800" height="600"></canvas>"""
   , compile: compile "https://compile.purescript.org/behaviors"
-  , getBundle: getDefaultBundle "https://compile.purescript.org/behaviors"
   }
 getBackendConfig Flare = BackendConfig
   { backend: "flare"
@@ -290,7 +286,6 @@ getBackendConfig Flare = BackendConfig
       , """<canvas id="canvas" width="800" height="600"></canvas>"""
       ]
   , compile: compile "https://compile.purescript.org/flare"
-  , getBundle: getDefaultBundle "https://compile.purescript.org/flare"
   }
 
 getBackendConfigFromString :: String -> BackendConfig
