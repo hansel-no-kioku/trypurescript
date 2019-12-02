@@ -149,22 +149,26 @@ compile bc@(BackendConfig backend) = do
         cleanUpMarkers
 
         case res of
-          Right (CompileSuccess (SuccessResult { js, bundled, warnings })) -> do
+          Right (CompileSuccess (SuccessResult { js, warnings })) -> do
             showJs <- isShowJsChecked
             if showJs
               then do hideLoadingMessage
                       displayPlainText js
-              else do hideLoadingMessage
-                      for_ (unwrap warnings) \warnings_ -> do
-                        let toAnnotation (CompileWarning{ errorCode, position, message }) =
-                              unwrap position <#> \(ErrorPosition pos) ->
-                                { row: pos.startLine - 1
-                                , column: pos.startColumn - 1
-                                , type: "warning"
-                                , text: message
-                                }
-                        runEffFn1 setAnnotations (mapMaybe toAnnotation warnings_)
-                      execute (JS bundled) bc
+              else runContT (runExceptT backend.getBundle) \bundleResult -> do
+                     hideLoadingMessage
+                     case bundleResult of
+                       Left err -> error ("Unable to retrieve JS bundle: " <> err)
+                       Right bundle -> do
+                         for_ (unwrap warnings) \warnings_ -> do
+                           let toAnnotation (CompileWarning{ errorCode, position, message }) =
+                                 unwrap position <#> \(ErrorPosition pos) ->
+                                   { row: pos.startLine - 1
+                                   , column: pos.startColumn - 1
+                                   , type: "warning"
+                                   , text: message
+                                   }
+                           runEffFn1 setAnnotations (mapMaybe toAnnotation warnings_)
+                         execute (JS js) bundle bc
           Right (CompileFailed (FailedResult { error })) -> do
             hideLoadingMessage
             case error of
@@ -195,8 +199,8 @@ compile bc@(BackendConfig backend) = do
             traverse_ (error <<< renderForeignError) errs
 
 -- | Execute the compiled code in a new iframe.
-execute :: forall eff. JS -> BackendConfig -> Eff (dom :: DOM | eff) Unit
-execute bundled bc@(BackendConfig backend) = do
+execute :: forall eff. JS -> JS -> BackendConfig -> Eff (dom :: DOM | eff) Unit
+execute js bundle bc@(BackendConfig backend) = do
   let html = joinWith "\n"
         [ """<!DOCTYPE html>"""
         , """<html>"""
@@ -214,7 +218,20 @@ execute bundled bc@(BackendConfig backend) = do
         , """</html>"""
         ]
 
-      scripts = backend.preScript <> unwrap bundled <> backend.postScript
+      replaced = replace' (unsafeRegex """require\("[^"]*"\)""" global) (\s _ ->
+        "PS['" <> String.drop 12 (String.take (String.length s - 11) s) <> "']") (unwrap js)
+
+      wrapped = joinWith "\n"
+        [ "var module = {};"
+        , "(function(module) {"
+        , replaced
+        , "})(module);"
+        , "module.exports.main && module.exports.main();"
+        ]
+
+      scripts = backend.preScript
+             <> joinWith "\n" [unwrap bundle, wrapped]
+             <> backend.postScript
 
   column2 <- JQuery.select "#column2"
   runEffFn3 setupIFrame column2 html scripts

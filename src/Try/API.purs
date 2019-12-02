@@ -107,7 +107,6 @@ instance decodeCompileWarning :: Decode CompileWarning where
 
 newtype SuccessResult = SuccessResult
   { js :: String
-  , bundled :: String
   , warnings :: NullOrUndefined (Array CompileWarning)
   }
 
@@ -207,6 +206,7 @@ newtype BackendConfig = BackendConfig
                    . String
                   -> ExceptT String (ContT Unit (Eff (dom :: DOM | eff)))
                        (Either (NonEmptyList ForeignError) CompileResult)
+  , getBundle     :: forall eff. ExceptT String (ContT Unit (Eff (dom :: DOM | eff))) JS
   , preScript     :: String
   , postScript    :: String
   }
@@ -245,6 +245,7 @@ getBackendConfig Core = BackendConfig
   , extra_styling: ""
   , extra_body: ""
   , compile: compile $ host <> "/api/core"
+  , getBundle: getDefaultBundle $ host <> "/api/core"
   , preScript: preScriptCore
   , postScript: postScriptCore
   }
@@ -254,6 +255,7 @@ getBackendConfig Thermite = BackendConfig
   , extra_styling: """<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">"""
   , extra_body: """<div id="app"></div>"""
   , compile: compile "https://compile.purescript.org/thermite"
+  , getBundle: getThermiteBundle "https://compile.purescript.org/thermite"
   , preScript: ""
   , postScript: ""
   }
@@ -263,6 +265,7 @@ getBackendConfig Slides = BackendConfig
   , extra_styling: """<link rel="stylesheet" href="css/slides.css">"""
   , extra_body: """<div id="main"></div>"""
   , compile: compile "https://compile.purescript.org/slides"
+  , getBundle: getDefaultBundle "https://compile.purescript.org/slides"
   , preScript: ""
   , postScript: ""
   }
@@ -275,6 +278,7 @@ getBackendConfig Mathbox = BackendConfig
       ]
   , extra_body: ""
   , compile: compile "https://compile.purescript.org/purescript-mathbox"
+  , getBundle: getDefaultBundle "https://compile.purescript.org/purescript-mathbox"
   , preScript: ""
   , postScript: ""
   }
@@ -284,6 +288,7 @@ getBackendConfig Behaviors = BackendConfig
   , extra_styling: ""
   , extra_body: """<canvas id="canvas" width="800" height="600"></canvas>"""
   , compile: compile "https://compile.purescript.org/behaviors"
+  , getBundle: getDefaultBundle "https://compile.purescript.org/behaviors"
   , preScript: ""
   , postScript: ""
   }
@@ -298,6 +303,7 @@ getBackendConfig Flare = BackendConfig
       , """<canvas id="canvas" width="800" height="600"></canvas>"""
       ]
   , compile: compile "https://compile.purescript.org/flare"
+  , getBundle: getDefaultBundle "https://compile.purescript.org/flare"
   , preScript: ""
   , postScript: ""
   }
