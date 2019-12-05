@@ -229,9 +229,7 @@ execute js bundle bc@(BackendConfig backend) = do
         , "module.exports.main && module.exports.main();"
         ]
 
-      scripts = backend.preScript
-             <> joinWith "\n" [unwrap bundle, wrapped]
-             <> backend.postScript
+      scripts = joinWith "\n" [unwrap bundle, wrapped]
 
   column2 <- JQuery.select "#column2"
   runEffFn3 setupIFrame column2 html scripts
