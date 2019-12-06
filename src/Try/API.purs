@@ -239,7 +239,7 @@ derive instance ordBackend :: Ord Backend
 getBackendConfig :: Backend -> BackendConfig
 getBackendConfig Core = BackendConfig
   { backend: "core"
-  , mainGist: "b57a766d417e109785540d584266fc33"
+  , mainGist: "1d809a04fbd6f229d74c163b440a7a3a"
   , extra_styling: ""
   , extra_body: ""
   , compile: compile $ host <> "/api/core"
