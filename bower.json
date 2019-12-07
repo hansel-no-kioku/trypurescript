@@ -16,7 +16,6 @@
     "purescript-random": "^3.0.0"
   },
   "devDependencies": {
-    "ace": "^1.2.8",
     "jquery": "^3.2.1",
     "underscore": "^1.8.3",
     "react": "^15.6.1",
