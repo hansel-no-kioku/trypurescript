@@ -211,6 +211,7 @@ newtype BackendConfig = BackendConfig
 
 data Backend
   = Core
+  | Phina
   | Thermite
   | Slides
   | Mathbox
@@ -219,6 +220,7 @@ data Backend
 
 backendFromString :: Partial => String -> Backend
 backendFromString "core"      = Core
+backendFromString "phina"     = Phina
 backendFromString "thermite"  = Thermite
 backendFromString "slides"    = Slides
 backendFromString "mathbox"   = Mathbox
@@ -227,6 +229,7 @@ backendFromString "flare"     = Flare
 
 backendToString :: Backend -> String
 backendToString Core      = "core"
+backendToString Phina     = "phina"
 backendToString Thermite  = "thermite"
 backendToString Slides    = "slides"
 backendToString Mathbox   = "mathbox"
@@ -244,6 +247,14 @@ getBackendConfig Core = BackendConfig
   , extra_body: ""
   , compile: compile $ host <> "/api/core"
   , getBundle: getDefaultBundle $ host <> "/api/core"
+  }
+getBackendConfig Phina = BackendConfig
+  { backend: "phina"
+  , mainGist: "c30b3ac7bf5197a3ad6b48ac6bce7d25"
+  , extra_styling: ""
+  , extra_body: """<script src="//cdn.jsdelivr.net/gh/phinajs/phina.js@0.2.2/build/phina.min.js"></script>"""
+  , compile: compile $ host <> "/api/phina"
+  , getBundle: getDefaultBundle $ host <> "/api/phina"
   }
 getBackendConfig Thermite = BackendConfig
   { backend: "thermite"
