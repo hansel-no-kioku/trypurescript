@@ -16,6 +16,7 @@
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/mode-haskell.js"></script>
   <!-- <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/theme-dawn.js"></script> -->
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/theme-clouds.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ext-language_tools.js"></script>
 
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,600">
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto+Slab:300,600">
@@ -133,7 +134,12 @@
     editor.renderer.setShowGutter(true);
     editor.setFontSize(13);
     editor.setShowPrintMargin(false);
-    editor.setTheme("ace/theme/clouds");
+    editor.setOptions({
+      theme: "ace/theme/clouds",
+      vScrollBarAlwaysVisible: true,
+      enableBasicAutocompletion: true,
+      enableLiveAutocompletion: true
+    });
 
     var session = editor.getSession();
 
