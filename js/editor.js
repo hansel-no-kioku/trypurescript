@@ -13,6 +13,8 @@ let tabKey = (cm) => {
 let cm = CodeMirror(document.getElementById("code"), {
   mode: 'haskell',
   theme: 'idea',
+  styleActiveLine: true,
+  matchBrackets: true,
   tabSize: 2,
   lineNumbers: true,
   gutters: ["annotations", "CodeMirror-linenumbers"],
