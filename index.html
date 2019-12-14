@@ -12,11 +12,15 @@
 
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js" charset="utf-8"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/mode-haskell.js"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/theme-clouds.js"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ext-language_tools.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/codemirror@5.49.2/lib/codemirror.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/codemirror@5.49.2/mode/haskell/haskell.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/codemirror@5.49.2/addon/hint/show-hint.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/codemirror@5.49.2/addon/hint/anyword-hint.js"></script>
 
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/codemirror@5.49.2/lib/codemirror.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/codemirror@5.49.2/theme/idea.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/codemirror@5.49.2/addon/hint/show-hint.css">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons+Outlined">
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,600">
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto+Slab:300,600">
   <link rel="stylesheet" type="text/css" href="css/index.css">
@@ -130,73 +134,6 @@
       dataType: 'text'
     });
 
-    var editor, cleanupActions = [];
-
-    editor = ace.edit('code');
-
-    editor.renderer.setShowGutter(true);
-    editor.setFontSize(13);
-    editor.setShowPrintMargin(false);
-    editor.setOptions({
-      theme: "ace/theme/clouds",
-      vScrollBarAlwaysVisible: true,
-      enableBasicAutocompletion: true,
-      enableLiveAutocompletion: true
-    });
-
-    var session = editor.getSession();
-
-    session.setMode('ace/mode/haskell');
-    session.setOptions({
-      tabSize: 2,
-      useSoftTabs: true
-    });
-
-    function setEditorContent(value) {
-      session.setValue(value);
-    }
-
-    function onEditorChanged(callback, millis) {
-      session.on('change', _.debounce(function() {
-        callback(session.getValue());
-      }, millis));
-    }
-
-    function cleanUpMarkers() {
-      for (var i = 0; i < cleanupActions.length; i++) {
-        cleanupActions[i]();
-      }
-
-      cleanupActions = [];
-    }
-
-    function setAnnotations(annotations) {
-      editor.session.setAnnotations(annotations);
-    }
-
-    function addMarker(type, startLine, startColumn, endLine, endColumn) {
-      if (startLine === endLine && endColumn <= startColumn) {
-        // Make sure the range is at least one character wide.
-        if (startColumn > 0) {
-          startColumn = endColumn - 1;
-        } else {
-          endColumn = startColumn + 1;
-        }
-      }
-
-      // Add an error marker
-      var range = new(ace.require("ace/range").Range)
-        (startLine - 1, startColumn - 1, endLine - 1, endColumn - 1);
-
-      var marker = editor.session.addMarker(range, type, "text", true);
-
-      cleanupActions.push((function(marker) {
-        return function() {
-          editor.session.removeMarker(marker);
-        };
-      })(marker));
-    }
-
     function setupIFrame($ctr, html, js) {
       var $iframe = $('<iframe id="output-iframe">');
 
@@ -225,6 +162,7 @@
       return $iframe;
     }
   </script>
+  <script src="js/editor.js"></script>
   <script type="text/javascript" src="js/index.js"></script>
 </body>
 </html>

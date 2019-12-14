@@ -267,3 +267,37 @@ iframe {
     display: none;
   }
 }
+
+/* hansel */
+.CodeMirror {
+  height: 100%;
+  font-size: 13px;
+}
+
+.separator {
+  background-color: #f0f0f0;
+}
+
+.marker-error {
+  border-bottom: dotted 2px #ff3300;
+}
+
+.annotations {
+  width: 1.5em;
+}
+
+.annotation {
+  text-align: center;
+}
+
+.annotation-warning {
+  color: #eeaa00;
+}
+
+.annotation-error {
+  color: #ff3300;
+}
+
+.annotation .material-icons-outlined {
+  font-size: 18px;
+}
