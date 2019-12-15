@@ -45,7 +45,9 @@ var setAnnotations = (annotations) => {
     var marker = document.createElement('div');
     marker.className = 'annotation annotation-' + annotation.type;
     let icon = annotation.type == "warning" ? "report_problem" : "error_outline"
-    marker.innerHTML = '<i class="material-icons-outlined" title="' + annotation.text + '">' + icon + '</i>';
+    let tooltip = annotation.text.replace('\n', '<br>');
+    marker.innerHTML = '<i class="material-icons-outlined">' + icon + '</i>'
+                     + '<div class="tooltip">' + tooltip + '</div>';
     return marker;
   };
 
