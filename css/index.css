@@ -301,3 +301,11 @@ iframe {
 .annotation .material-icons-outlined {
   font-size: 18px;
 }
+
+.tippy-tooltip.tp-theme {
+  background-color: #ffffe0;
+  border: solid 1px #777;
+  box-shadow: 2px 2px 4px rgba(127, 127, 127, 0.5);
+  color: black;
+  font-size: 13px;
+}

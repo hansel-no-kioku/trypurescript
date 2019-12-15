@@ -49,7 +49,9 @@ var setAnnotations = (annotations) => {
     marker.innerHTML = '<i class="material-icons-outlined">' + icon + '</i>';
     tippy(marker.children[0],
       { content: tooltip,
-        theme: 'material',
+        theme: 'tp',
+        arrow: false,
+        distance: 16,
         followCursor: true
       });
     return marker;
