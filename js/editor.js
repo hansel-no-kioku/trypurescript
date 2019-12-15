@@ -42,12 +42,16 @@ var cleanUpMarkers = () => {
 
 var setAnnotations = (annotations) => {
   let makeMarker = annotation => {
-    var marker = document.createElement('div');
-    marker.className = 'annotation annotation-' + annotation.type;
     let icon = annotation.type == "warning" ? "report_problem" : "error_outline"
     let tooltip = annotation.text.replace('\n', '<br>');
-    marker.innerHTML = '<i class="material-icons-outlined">' + icon + '</i>'
-                     + '<div class="tooltip">' + tooltip + '</div>';
+    let marker = document.createElement('div');
+    marker.className = 'annotation annotation-' + annotation.type;
+    marker.innerHTML = '<i class="material-icons-outlined">' + icon + '</i>';
+    tippy(marker.children[0],
+      { content: tooltip,
+        theme: 'material',
+        followCursor: true
+      });
     return marker;
   };
 
