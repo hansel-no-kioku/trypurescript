@@ -267,3 +267,45 @@ iframe {
     display: none;
   }
 }
+
+/* hansel */
+.CodeMirror {
+  height: 100%;
+  font-size: 13px;
+}
+
+.separator {
+  background-color: #f0f0f0;
+}
+
+.marker-error {
+  border-bottom: dotted 2px #ff3300;
+}
+
+.annotations {
+  width: 1.5em;
+}
+
+.annotation {
+  text-align: center;
+}
+
+.annotation-warning {
+  color: #eeaa00;
+}
+
+.annotation-error {
+  color: #ff3300;
+}
+
+.annotation .material-icons-outlined {
+  font-size: 18px;
+}
+
+.tippy-tooltip.tp-theme {
+  background-color: #ffffe0;
+  border: solid 1px #777;
+  box-shadow: 2px 2px 4px rgba(127, 127, 127, 0.5);
+  color: black;
+  font-size: 13px;
+}
