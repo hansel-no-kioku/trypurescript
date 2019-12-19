@@ -18,6 +18,7 @@ let cm = CodeMirror(document.getElementById("code"), {
   tabSize: 2,
   lineNumbers: true,
   gutters: ["annotations", "CodeMirror-linenumbers"],
+  inputStyle: 'contenteditable',
   extraKeys: {
     Tab: tabKey,
     'Shift-Tab': (cm) => cm.execCommand('indentLess'),
