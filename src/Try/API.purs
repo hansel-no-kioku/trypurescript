@@ -252,7 +252,7 @@ getBackendConfig Phina = BackendConfig
   { backend: "phina"
   , mainGist: "c30b3ac7bf5197a3ad6b48ac6bce7d25"
   , extra_styling: ""
-  , extra_body: """<script src="//cdn.jsdelivr.net/gh/phinajs/phina.js@0.2.2/build/phina.min.js"></script>"""
+  , extra_body: """<script src="//cdn.jsdelivr.net/gh/phinajs/phina.js@0.2.2/build/phina.min.js"></script><script src="js/phina-override.js"></script>"""
   , compile: compile $ host <> "/api/phina"
   , getBundle: getDefaultBundle $ host <> "/api/phina"
   }
