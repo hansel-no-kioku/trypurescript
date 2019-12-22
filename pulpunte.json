@@ -1,0 +1,22 @@
+{
+  "name": "trypurescript",
+  "packageSet": {
+    "set": "psc-0.13.5",
+    "repo": "https://github.com/purescript/package-sets.git"
+  },
+  "dependencies": [
+    "console",
+    "effect",
+    "foreign-generic",
+    "foreign-object",
+    "jquery",
+    "js-timers",
+    "parallel",
+    "prelude",
+    "random",
+    "web-html"
+  ],
+  "devDependencies": [
+    "psci-support"
+  ]
+}
