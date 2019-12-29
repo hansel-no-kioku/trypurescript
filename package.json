@@ -3,7 +3,7 @@
   "scripts": {
     "clean": "rimraf output",
     "build": "pulpunte build --skip-bundle",
-    "bundle": "pulpunte build --to js/index.js"
+    "bundle": "pulpunte run -m Setup && pulpunte build --to js/index.js"
   },
   "devDependencies": {
     "pulpunte": "^0.2.0",

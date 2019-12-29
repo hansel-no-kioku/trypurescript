@@ -1,4 +1,5 @@
-module Try.Host where
+module Try.Host
+  ( host
+  ) where
 
-host :: String
-host = "http://localhost:3000"
+foreign import host ∷ String

@@ -11,6 +11,8 @@
     "foreign-object",
     "jquery",
     "js-timers",
+    "node-fs",
+    "node-process",
     "parallel",
     "prelude",
     "random",
