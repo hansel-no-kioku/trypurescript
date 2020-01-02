@@ -22,7 +22,21 @@ let cm = CodeMirror(document.getElementById("code"), {
   extraKeys: {
     Tab: tabKey,
     'Shift-Tab': (cm) => cm.execCommand('indentLess'),
-    'Ctrl-Space': 'autocomplete'
+    'Ctrl-Space': (cm) => cm.showHint({completeSingle: false})
+  }
+});
+
+// 単語1文字目の入力時にヒントを表示する
+cm.on('change', (cm, changeObj) => {
+  if (cm.showHint &&
+      !cm.state.completionActive &&
+      changeObj.origin == "+input" &&
+      changeObj.from.line == changeObj.to.line &&
+      changeObj.text[0] && changeObj.text[0].length > 0) {
+    let cur = cm.getCursor(), curLine = cm.getLine(cur.line);
+    let end = cur.ch, start = end;
+    while (start && /[\w$]+/.test(curLine.charAt(start - 1))) --start;
+    if (start + 1 == end) cm.showHint({completeSingle: false});
   }
 });
 
