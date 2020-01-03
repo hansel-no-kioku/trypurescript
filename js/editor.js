@@ -326,7 +326,8 @@ let cm = CodeMirror(document.getElementById("code"), {
   extraKeys: {
     Tab: tabKey,
     'Shift-Tab': (cm) => cm.execCommand('indentLess'),
-    'Ctrl-Space': (cm) => cm.showHint(showHintOptions)
+    'Ctrl-Space': (cm) => cm.showHint(showHintOptions),
+    'Ctrl-/': 'toggleComment'
   }
 });
 
