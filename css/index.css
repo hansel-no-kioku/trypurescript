@@ -317,3 +317,7 @@ iframe {
 .CodeMirror-selection-highlight-scrollbar {
   background-color: #3c7;
 }
+
+.cm-trailingspace {
+  background-color: #fcc;
+}

@@ -320,6 +320,7 @@ let cm = CodeMirror(document.getElementById("code"), {
   styleActiveLine: true,
   matchBrackets: true,
   highlightSelectionMatches: {showToken: /\w/, annotateScrollbar: true},
+  showTrailingSpace: true,
   tabSize: 2,
   lineNumbers: true,
   gutters: ["annotations", "CodeMirror-linenumbers"],
