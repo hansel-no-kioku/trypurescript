@@ -309,3 +309,11 @@ iframe {
   color: black;
   font-size: 13px;
 }
+
+.cm-matchhighlight {
+  background-color: #bfd;
+}
+
+.CodeMirror-selection-highlight-scrollbar {
+  background-color: #3c7;
+}
