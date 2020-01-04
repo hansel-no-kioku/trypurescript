@@ -203,12 +203,6 @@ const pursOperators = [
 
 const pursKeywords = pursSyntax.concat(pursModulesAndTypes, pursFunctions);
 
-const getCurWord = (cm, result) => {
-  const start = result.from.ch;
-  const end = result.to.ch;
-  return start < end && cm.getLine(result.from.line).slice(start, end);
-};
-
 const resolvePursKeywords = (curWord, keywords) => {
   return words = curWord ? keywords.filter(keyword => keyword.startsWith(curWord))
                          : keywords;
@@ -258,21 +252,55 @@ const resolveOperators = (curWord, operators, ucPrefix) => {
 
 // purescript/src/Language/PureScript/CST/Lexer.hs isSymbolChar
 const word = /\w+|[:!#$%&\*\+\./<=>?@\\^|\-~]+/
-const wordEx = /^\w+|^[:!#$%&\*\+\./<=>?@\\^|\-~]+/
+
+const getCurWord = (cm) => {
+  const cur = cm.getCursor();
+  const curLine = cm.getLine(cur.line);
+  const end = cur.ch;
+  const test = str => {let res = word.exec(str); return res && res[0] === str;};
+  let start = end;
+  while (start && test(curLine.slice(start - 1, end))) --start;
+  return {
+    curWord: start < end && curLine.slice(start, end),
+    from: CodeMirror.Pos(cur.line, start),
+    to: CodeMirror.Pos(cur.line, end)
+  };
+};
+
+const resolveAnyWords = (cm, curWord) => {
+  const range = 500;
+  const cur = cm.getCursor();
+  let list = [];
+  let seen = {};
+  let re = new RegExp(word.source, "g");
+  for (let dir = -1; dir <= 1; dir += 2) {
+    let line = cur.line;
+    const endLine = Math.min(Math.max(line + dir * range, cm.firstLine()), cm.lastLine()) + dir;
+    for (; line != endLine; line += dir) {
+      const text = cm.getLine(line);
+      let m;
+      while (m = re.exec(text)) {
+        if (line == cur.line && m[0] === curWord) continue;
+        if ((!curWord || m[0].lastIndexOf(curWord, 0) == 0) && !Object.prototype.hasOwnProperty.call(seen, m[0])) {
+          seen[m[0]] = true;
+          list.push(m[0]);
+        }
+      }
+    }
+  }
+  return list;
+};
 
 CodeMirror.registerHelper("hint", "haskell", function(cm) {
-  const anyResult = CodeMirror.hint.anyword
-                      ? CodeMirror.hint.anyword(cm, {word: word})
-                      : [];
-  const curWord = anyResult && getCurWord(cm, anyResult);
+  const {curWord, from, to} = getCurWord(cm);
 
   const kwList = resolvePursKeywords(curWord, pursKeywords);
   const symbolList = resolveOperators(curWord, pursUnicodeSyntax, "[u]");
   const operatorList = resolveOperators(curWord, pursOperators, "[U]");
-
   const pursList = kwList.concat(symbolList, operatorList);
 
-  const anyList = anyResult.list.filter(k => !pursList.find(
+  const anyResult = resolveAnyWords(cm, curWord);
+  const anyList = anyResult.filter(k => !pursList.find(
                     p => typeof p === "string" ? p === k : p.text === k));
 
   const list = pursList.concat(anyList).sort((a, b) => {
@@ -281,7 +309,7 @@ CodeMirror.registerHelper("hint", "haskell", function(cm) {
     return strA.localeCompare(strB);
   });
 
-  return { list: list, from: anyResult.from, to: anyResult.to }
+  return { list: list, from: from, to: to }
 });
 
 const showHintOptions = {
@@ -295,10 +323,8 @@ const showHintByInput = (cm, changeObj) => {
       changeObj.origin == "+input" &&
       changeObj.from.line == changeObj.to.line &&
       changeObj.text[0] && changeObj.text[0].length > 0) {
-    let cur = cm.getCursor(), curLine = cm.getLine(cur.line);
-    let end = cur.ch, start = end;
-    while (start && wordEx.test(curLine.slice(start - 1, end))) --start;
-    if (start + 1 == end) cm.showHint(showHintOptions);
+    const {curWord} = getCurWord(cm);
+    curWord && curWord.length == 1 && cm.showHint(showHintOptions);
   }
 };
 
