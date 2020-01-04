@@ -319,6 +319,7 @@ let cm = CodeMirror(document.getElementById("code"), {
   theme: 'idea',
   styleActiveLine: true,
   matchBrackets: true,
+  autoCloseBrackets: {pairs: "()[]{}\"\"", triples: "\""},
   highlightSelectionMatches: {showToken: /\w/, annotateScrollbar: true},
   showTrailingSpace: true,
   tabSize: 2,
