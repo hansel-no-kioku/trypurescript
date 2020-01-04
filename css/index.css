@@ -279,7 +279,9 @@ iframe {
 }
 
 .marker-error {
-  border-bottom: dotted 2px #ff3300;
+  background-image: url(data:image/gif;base64,R0lGODlhCgAEAMIEAP9BGP6pl//Wy/7//P///////////////yH5BAEKAAQALAAAAAAKAAQAAAMROCOhK0oA0MIUMmTAZhsWBCYAOw==);
+  background-position: bottom left;
+  background-repeat: repeat-x;
 }
 
 .annotations {
