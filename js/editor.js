@@ -380,17 +380,16 @@ var cleanUpMarkers = () => {
 
 var setAnnotations = (annotations) => {
   let makeMarker = annotation => {
-    let icon = annotation.type == "warning" ? "report_problem" : "error_outline"
-    let tooltip = annotation.text.replace('\n', '<br>');
-    let marker = document.createElement('div');
+    const icon = annotation.type == "warning" ? "report_problem" : "error_outline"
+    const text = annotation.text.replace('\n', '<br>');
+    const marker = document.createElement('div');
     marker.className = 'annotation annotation-' + annotation.type;
     marker.innerHTML = '<i class="material-icons-outlined">' + icon + '</i>';
-    tippy(marker.children[0],
-      { content: tooltip,
+    const tip = tippy(marker.children[0],
+      { content: text,
         theme: 'tp',
         arrow: false,
-        distance: 16,
-        followCursor: true
+        trigger: "click",
       });
     return marker;
   };

@@ -285,11 +285,11 @@ iframe {
 }
 
 .annotations {
-  width: 1.5em;
+  width: 22px;
 }
 
 .annotation {
-  text-align: center;
+  margin-left: 4px;
 }
 
 .annotation-warning {
