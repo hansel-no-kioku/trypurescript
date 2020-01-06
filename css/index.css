@@ -308,8 +308,38 @@ iframe {
   background-color: #ffffe0;
   border: solid 1px #777;
   box-shadow: 2px 2px 4px rgba(127, 127, 127, 0.5);
+}
+
+.tippy-content {
   color: black;
   font-size: 13px;
+}
+
+.tippy-content .ui {
+  text-align: center;
+  margin-top: 4px;
+  padding: 4px;
+}
+
+.tippy-content .ui button {
+  background-color: white;
+  border: solid 1px #999;
+  border-radius: 6px;
+  outline: 0;
+  padding: 3px 8px;
+  color: #777;
+  font-size: 12px;
+}
+
+.tippy-content .ui button:hover {
+  border-color: #d51;
+  color: #d51;
+  transition-duration: 500ms;
+}
+
+.tippy-content .ui button:active {
+  background-color: #fff0e0;
+  transition-duration: 0ms;
 }
 
 .cm-matchhighlight {

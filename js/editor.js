@@ -363,6 +363,54 @@ let cm = CodeMirror(document.getElementById("code"), {
 // 単語入力開始時にヒントを表示する
 cm.on('change', showHintByInput);
 
+// Suggestions
+let suggestions = [];
+
+const clearSuggestions = () => suggestions = [];
+
+const addSuggestion = suggestion => {
+  console.log(suggestion);
+  if (suggestion && suggestion.replaceRange) {
+    const range = suggestion.replaceRange;
+    const startLine = range.startLine - 1;
+    suggestions = suggestions.filter(s => s.startLine !== startLine);
+    suggestions.push({
+      from: {line: startLine, ch: range.startColumn - 1},
+      to: {line: range.endLine - 1, ch: range.endColumn - 1},
+      replacement: suggestion.replacement
+    });
+    return suggestion;
+  }
+};
+
+const applySuggestion = lineNo => {
+  tippy.hideAll();
+  const suggestion = suggestions.find(s => s.from.line === lineNo - 1);
+  if (suggestion) {
+    // 行置換: start:1 end: 改行まで、replace: 改行1つ
+    // 行挿入: start:1 end: 1、replace: 改行2つ
+    // 行削除: start:1 end: 改行まで、replace: ""
+    // 行内一部置換: 事例なし
+    // CodeMirror では最終行を消す手段はなさそう。
+    let replacement = suggestion.replacement;
+    let to = suggestion.to;
+    const hasLF = /(.*)\n$/s.exec(replacement);
+    if (0 === to.ch) {
+      if (hasLF) {
+        replacement = hasLF[1];
+      }
+    } else if (cm.getLine(to.line).length <= to.ch) {
+      if (hasLF) {
+        replacement = hasLF[1];
+      } else {
+        to = {line: to.line + 1, ch: 0};
+      }
+    }
+    cm.replaceRange(replacement, suggestion.from, to);
+  }
+};
+
+// APIs
 var setEditorContent = (value) => {
   cm.setValue(value);
 };
@@ -374,22 +422,30 @@ var onEditorChanged = (callback, millis) => {
 };
 
 var cleanUpMarkers = () => {
+  clearSuggestions();
   cm.getAllMarks().forEach(e => e.clear());
   cm.clearGutter("annotations");
 };
 
 var setAnnotations = (annotations) => {
-  let makeMarker = annotation => {
+  const makeMarker = annotation => {
     const icon = annotation.type == "warning" ? "report_problem" : "error_outline"
     const text = annotation.text.replace('\n', '<br>');
+    const suggestion = addSuggestion(annotation.suggestion);
+    const ui = suggestion
+                ? '<div class="ui"><button type="button" onClick="applySuggestion(' + suggestion.replaceRange.startLine + ');">Apply Suggestion</button></div>'
+                : '';
     const marker = document.createElement('div');
     marker.className = 'annotation annotation-' + annotation.type;
     marker.innerHTML = '<i class="material-icons-outlined">' + icon + '</i>';
     const tip = tippy(marker.children[0],
-      { content: text,
+      { content: text + ui,
         theme: 'tp',
         arrow: false,
-        trigger: "click",
+        trigger: 'click',
+        animation: 'shift-toward',
+        interactive: true,
+        appendTo: document.body,
       });
     return marker;
   };

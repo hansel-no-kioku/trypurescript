@@ -9,7 +9,6 @@ import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Foldable (elem, fold, for_, intercalate, traverse_)
 import Data.FoldableWithIndex (forWithIndex_)
-import Foreign.Object as Object
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (unwrap)
 import Data.String (joinWith)
@@ -21,7 +20,10 @@ import Effect (Effect)
 import Effect.Console (error)
 import Effect.Timer (setTimeout)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3, EffectFn5, mkEffectFn1, runEffectFn1, runEffectFn2, runEffectFn3, runEffectFn5)
-import Foreign (renderForeignError)
+import Foreign (Foreign, renderForeignError)
+import Foreign.Generic (encode)
+import Foreign.NullOrUndefined (null)
+import Foreign.Object as Object
 import JQuery (JQuery, addClass, append, setText, setAttr, attr, create, hide, on, ready, select, setProp, setValue) as JQuery
 import JQuery.Extras (empty, fadeIn, fadeOut, filter, getValueMaybe, is) as JQuery
 import Try.API (BackendConfig(..), CompileError(..), CompileResult(..), CompileWarning(..), CompilerError(..), ErrorPosition(..), FailedResult(..), SuccessResult(..), getBackendConfigFromString)
@@ -109,6 +111,7 @@ type Annotation =
   , column :: Int
   , type :: String
   , text :: String
+  , suggestion :: Foreign
   }
 
 -- | Set the gutter annotations
@@ -152,12 +155,13 @@ compile bc@(BackendConfig backend) = do
                        Left err -> error ("Unable to retrieve JS bundle: " <> err)
                        Right bundle -> do
                          for_ warnings \warnings_ -> do
-                           let toAnnotation (CompileWarning{ errorCode, position, message }) =
+                           let toAnnotation (CompileWarning{ errorCode, position, message, suggestion }) =
                                  position <#> \(ErrorPosition pos) ->
                                    { row: pos.startLine - 1
                                    , column: pos.startColumn - 1
                                    , type: "warning"
                                    , text: message
+                                   , suggestion: encode suggestion
                                    }
                            runEffectFn1 setAnnotations (mapMaybe toAnnotation warnings_)
                          execute (JS js) bundle bc
@@ -173,6 +177,7 @@ compile bc@(BackendConfig backend) = do
                         , column: pos.startColumn - 1
                         , type: "error"
                         , text: message
+                        , suggestion: null
                         }
                 runEffectFn1 setAnnotations (mapMaybe toAnnotation errs)
 

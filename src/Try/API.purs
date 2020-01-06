@@ -31,14 +31,17 @@ import Data.String.Regex.Unsafe (unsafeRegex)
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn3, EffectFn4, mkEffectFn1, runEffectFn3, runEffectFn4)
 import Foreign (Foreign, ForeignError)
-import Foreign.Generic (SumEncoding(..), defaultOptions, genericDecode)
-import Foreign.Generic.Class (class Decode, decode, Options)
+import Foreign.Generic (SumEncoding(..), defaultOptions, genericDecode, genericEncode)
+import Foreign.Generic.Class (class Decode, class Encode, Options, decode)
 import Partial.Unsafe (unsafePartial)
 import Try.Host (host)
 import Try.Types (JS(JS))
 
 decodingOptions :: Options
 decodingOptions = defaultOptions { unwrapSingleConstructors = true }
+
+encodingOptions :: Options
+encodingOptions = decodingOptions
 
 -- | The range of text associated with an error
 newtype ErrorPosition = ErrorPosition
@@ -52,6 +55,9 @@ derive instance genericErrorPosition :: Generic ErrorPosition _
 
 instance decodeErrorPosition :: Decode ErrorPosition where
   decode = genericDecode decodingOptions
+
+instance encodeErrorPosition :: Encode ErrorPosition where
+  encode = genericEncode encodingOptions
 
 newtype CompilerError = CompilerError
   { message :: String
@@ -90,6 +96,9 @@ derive instance genericSuggestion :: Generic Suggestion _
 
 instance decodeSuggestion :: Decode Suggestion where
   decode = genericDecode decodingOptions
+
+instance encodeSuggestion :: Encode Suggestion where
+  encode = genericEncode encodingOptions
 
 newtype CompileWarning = CompileWarning
   { errorCode :: String
